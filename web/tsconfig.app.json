@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "exclude": [
+    "node_modules",
+    "src/lib/adSequence/__tests__/adSequence.orchestrator.integration.test.ts",
+    "src/lib/reusableAsset/__tests__/reusableAsset.bridge.test.ts"
+  ]
+}

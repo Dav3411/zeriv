@@ -1,0 +1,2 @@
+-- user_wallets 전용 스크립트는 all_user_fk_cascade.sql 로 통합되었습니다.
+-- 계정 삭제 시 모든 테이블에서 삭제된 UUID가 보이지 않게 하려면 web/sql/all_user_fk_cascade.sql 만 실행하세요.

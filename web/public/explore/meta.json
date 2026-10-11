@@ -1,0 +1,149 @@
+[
+  {
+    "id": "kbeauty_01",
+    "src": "/explore/kbeauty_01.png",
+    "category": "k_beauty",
+    "title": "글로우 스킨케어 룩",
+    "aspectRatio": "9:16"
+  },
+  {
+    "id": "kbeauty_02",
+    "src": "/explore/kbeauty_02.png",
+    "category": "k_beauty",
+    "title": "퍼플 메이크업 아트",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "kbeauty_03",
+    "src": "/explore/kbeauty_03.png",
+    "category": "k_beauty",
+    "title": "봄 라이트 메이크업",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "kbeauty_04",
+    "src": "/explore/kbeauty_04.png",
+    "category": "k_beauty",
+    "title": "나이트 글램 룩",
+    "aspectRatio": "9:16"
+  },
+  {
+    "id": "kbeauty_05",
+    "src": "/explore/kbeauty_05.png",
+    "category": "k_beauty",
+    "title": "미니멀 클린 뷰티",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "fashion_01",
+    "src": "/explore/fashion_01.png",
+    "category": "fashion",
+    "title": "서울 스트리트 패션",
+    "aspectRatio": "9:16"
+  },
+  {
+    "id": "fashion_02",
+    "src": "/explore/fashion_02.png",
+    "category": "fashion",
+    "title": "파스텔 오피스 룩",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "fashion_03",
+    "src": "/explore/fashion_03.png",
+    "category": "fashion",
+    "title": "Y2K 레트로 스타일",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "fashion_04",
+    "src": "/explore/fashion_04.png",
+    "category": "fashion",
+    "title": "화이트 모노톤 룩",
+    "aspectRatio": "9:16"
+  },
+  {
+    "id": "fashion_05",
+    "src": "/explore/fashion_05.png",
+    "category": "fashion",
+    "title": "빈티지 카페 무드",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "product_01",
+    "src": "/explore/product_01.png",
+    "category": "product",
+    "title": "럭셔리 스킨케어 세트",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "product_02",
+    "src": "/explore/product_02.png",
+    "category": "product",
+    "title": "향수 컬렉션 촬영",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "product_03",
+    "src": "/explore/product_03.png",
+    "category": "product",
+    "title": "오가닉 뷰티 플랫레이",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "product_04",
+    "src": "/explore/product_04.png",
+    "category": "product",
+    "title": "그라데이션 배경 신제품",
+    "aspectRatio": "9:16"
+  },
+  {
+    "id": "lifestyle_01",
+    "src": "/explore/lifestyle_01.png",
+    "category": "lifestyle",
+    "title": "모닝 뷰티 루틴",
+    "aspectRatio": "9:16"
+  },
+  {
+    "id": "lifestyle_02",
+    "src": "/explore/lifestyle_02.png",
+    "category": "lifestyle",
+    "title": "도심 테라스 라이프",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "lifestyle_03",
+    "src": "/explore/lifestyle_03.png",
+    "category": "lifestyle",
+    "title": "젠틀 홈 케어",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "lifestyle_04",
+    "src": "/explore/lifestyle_04.png",
+    "category": "lifestyle",
+    "title": "플라워 마켓 모닝",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "portrait_01",
+    "src": "/explore/portrait_01.png",
+    "category": "portrait",
+    "title": "강렬한 스튜디오 포트레이트",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "portrait_02",
+    "src": "/explore/portrait_02.png",
+    "category": "portrait",
+    "title": "컬러풀 아트 포트레이트",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "portrait_03",
+    "src": "/explore/portrait_03.png",
+    "category": "portrait",
+    "title": "미스티 네이처 포트레이트",
+    "aspectRatio": "9:16"
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "showcase_01",
+    "src": "/studio-showcase/showcase_01.png",
+    "category": "product",
+    "title": "K-뷰티 세럼 히어로샷",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "showcase_02",
+    "src": "/studio-showcase/showcase_02.png",
+    "category": "fashion",
+    "title": "패션 에디토리얼 전신샷",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "showcase_03",
+    "src": "/studio-showcase/showcase_03.png",
+    "category": "k_beauty",
+    "title": "K-뷰티 글라스스킨 포트레이트",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "showcase_04",
+    "src": "/studio-showcase/showcase_04.png",
+    "category": "lifestyle",
+    "title": "스킨케어 플랫레이",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "showcase_05",
+    "src": "/studio-showcase/showcase_05.png",
+    "category": "fashion",
+    "title": "서울 스트리트 스타일",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "showcase_06",
+    "src": "/studio-showcase/showcase_06.png",
+    "category": "product",
+    "title": "프리미엄 퍼퓸 스틸라이프",
+    "aspectRatio": "1:1"
+  },
+  {
+    "id": "showcase_07",
+    "src": "/studio-showcase/showcase_07.png",
+    "category": "lifestyle",
+    "title": "서울 루프탑 골든아워",
+    "aspectRatio": "4:5"
+  },
+  {
+    "id": "showcase_08",
+    "src": "/studio-showcase/showcase_08.png",
+    "category": "portrait",
+    "title": "렘브란트 스튜디오 포트레이트",
+    "aspectRatio": "1:1"
+  }
+]

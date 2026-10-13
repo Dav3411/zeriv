@@ -1,96 +1,155 @@
 # Zeriv
 
-브랜드의 시각적 스타일을 구조화하고, 제품 사진과 AI 모델을 조합해 콘텐츠 이미지를 만드는 웹 서비스입니다.
-개발 기간은 **3개월**입니다. 이 저장소는 Zeriv의 웹 앱과 이미지 생성 워커를 독립적으로 정리한 포트폴리오용 소스 스냅샷입니다.
+![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 
-- 팀 구성: **2인 팀**
-- 본인 담당: **서비스 기획, 프론트엔드·백엔드 전반 구현 및 시스템 구성**
+**브랜드 스타일을 담은 AI 콘텐츠 이미지 제작 서비스**
 
-## 해결하려는 문제
+Zeriv는 브랜드의 색감, 질감, 라이팅과 장면을 저장하고 제품 사진·AI 모델과 조합해 이미지를 만드는 웹 서비스입니다. 매번 긴 프롬프트를 작성하는 대신, 저장한 스타일과 자산을 선택해 콘텐츠를 제작할 수 있습니다.
 
-브랜드 콘텐츠를 반복 제작할 때 색감·라이팅·배경 같은 시각적 기준을 매번 새로 설명해야 하고, 제품과 모델을 바꾸면 결과의 일관성을 유지하기 어렵습니다. Zeriv는 브랜드 스타일을 재사용 가능한 데이터로 저장하고, 제품·모델·스타일 선택에서 생성 결과 관리까지 연결합니다.
+[주요 기능](#주요-기능) · [시작하기](#시작하기) · [개발 가이드](docs/DEVELOPMENT.md) · [검증 기록](docs/VALIDATION.md)
 
-## 주요 기능과 구현
+## 주요 기능
 
-- **브랜드 스타일 관리:** 색상 팔레트, 질감, 라이팅, 장면, 무드와 소품 정보를 구조화합니다. 브랜드 정보와 레퍼런스를 분석해 스타일을 구성하고, 스타일 시트와 생성 프롬프트에 반영합니다. 여기서 스타일 추출은 LLM 기반 파라미터 구성으로, 모델 가중치를 재학습하는 fine-tuning을 의미하지 않습니다.
-- **Studio 이미지 생성:** 제품 단독 이미지와 제품+모델 이미지를 생성하는 경로를 제공합니다. Quick 모드에는 상품 카테고리와 이미지 형식에 따른 패턴 선택이 있습니다.
-- **비동기 작업:** API가 입력·접근 권한·생성 이용권을 확인하고 DB에 작업을 등록합니다. Node.js 워커는 `claim_next_job` RPC로 작업을 선점하며 동시 실행 수와 오래된 처리 작업의 재시도를 관리합니다.
-- **파일과 결과 관리:** 원본·생성 파일은 S3 호환 Cloudflare R2에, 작업 상태와 자산 메타데이터는 Supabase에 저장합니다. 자산 조회와 다운로드는 앱 경로를 통해 연결됩니다.
-- **서비스 기능:** 브랜드·조직 접근 제어, 구독·생성 팩, 결제·이메일 연동 코드가 포함됩니다. 외부 계정 설정과 기능별 통합 검증이 별도로 필요합니다.
+| 기능 | 설명 |
+| --- | --- |
+| 브랜드 스타일 | 색상, 질감, 라이팅, 장면, 무드와 소품 정보를 구조화하고 재사용합니다. |
+| 스타일 시트 | 브랜드 정보와 레퍼런스를 바탕으로 스타일을 구성하고, 생성에 사용할 프롬프트와 참조 이미지에 반영합니다. |
+| Studio | 제품 단독 이미지 또는 제품과 모델을 조합한 이미지를 생성합니다. |
+| Quick 모드 | 상품 카테고리와 이미지 형식에 맞는 패턴을 선택해 생성 요청을 구성합니다. |
+| 작업 큐 | 생성 요청을 비동기로 처리하고 진행 상태와 결과를 관리합니다. |
+| 자산 관리 | 제품·모델·스타일과 생성 결과를 저장하고 조회·다운로드합니다. |
+| 워크스페이스 | 브랜드·조직 접근 권한과 구독·생성 이용권을 관리합니다. |
+
+## 사용 흐름
+
+1. 브랜드 정보를 입력하고 스타일을 구성합니다.
+2. 제품 사진과 사용할 모델·스타일을 선택합니다.
+3. Studio에서 생성 요청을 등록합니다.
+4. 작업 상태를 확인하고 완성된 이미지를 다운로드합니다.
+
+스타일은 프롬프트와 참조 이미지로 생성에 반영합니다. 별도 모델 학습이나 fine-tuning을 사용하는 방식은 아닙니다.
+
+## 아키텍처
 
 ```mermaid
 flowchart LR
-    U[제품 / 모델 / 브랜드 스타일] --> UI[Next.js Studio]
-    UI --> API[render/create-job]
-    API --> DB[(Supabase 작업 / 자산 메타데이터)]
-    DB --> W[Node.js Worker]
-    W --> AI[외부 이미지 / 비전 API]
-    AI --> W
-    W --> R2[(Cloudflare R2)]
-    W --> DB
-    DB --> UI
+    User[사용자] --> Studio[Next.js Studio]
+    Studio --> API[생성 요청 API]
+    API --> DB[(Supabase)]
+    DB -->|작업 선점| Worker[Node.js Worker]
+    Worker -->|스타일 / 제품 / 모델 참조| AI[이미지 생성 API]
+    AI --> Worker
+    Worker -->|파일 저장| R2[(Cloudflare R2)]
+    Worker -->|상태 / 자산 정보 저장| DB
+    DB -->|작업 상태 / 결과| Studio
 ```
 
-## 기술 구성
+- **웹 앱:** 인증, 브랜드·자산 선택, 생성 요청, 결과 조회를 담당합니다.
+- **생성 API:** 입력값·접근 권한·이용권을 확인한 뒤 작업을 등록합니다.
+- **워커:** `claim_next_job` RPC로 작업을 선점하고 동시 실행 수와 오래된 처리 작업의 재시도를 관리합니다.
+- **저장소:** 파일은 R2에, 작업 상태와 자산 메타데이터는 Supabase에 저장합니다.
 
-Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · next-intl · Supabase Auth/Postgres · Node.js Worker · Cloudflare R2/S3 SDK · Gemini/OpenAI/xAI/Anthropic/FAL 연동 코드
+## 기술 스택
 
-## 코드 읽기 순서
-
-| 관심 영역 | 경로 |
+| 영역 | 기술 |
 | --- | --- |
-| Studio 화면 | `web/src/app/studio/` |
-| 스타일 데이터·프롬프트·시트 | `web/src/lib/style/` |
-| 브랜드별 스타일 API | `web/src/app/api/brands/[id]/styles/` |
-| 현재 이미지 생성 요청 | `web/src/app/api/render/create-job/route.ts` |
-| 이미지 생성 워커 | `web/scripts/worker.mjs` |
-| 작업 선점 SQL | `web/supabase/migrations/20260424_claim_next_job_rpc.sql` |
-| R2 업로드·다운로드 | `web/src/lib/r2.ts` |
-| 생성 이용권 소비·보상 | `web/src/lib/packConsumption.ts` |
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4, next-intl |
+| Backend | Next.js Route Handlers, Node.js Worker |
+| Database / Auth | Supabase PostgreSQL, Supabase Auth |
+| Storage | Cloudflare R2, AWS S3 SDK |
+| AI 연동 | Gemini, OpenAI, xAI, Anthropic, FAL |
 
-## 로컬 준비
+AI 제공자는 기능과 생성 경로에 따라 선택적으로 사용합니다.
 
-Node.js 20.9 이상과 npm이 필요합니다. 아래 예시는 PowerShell 기준입니다.
+## 시작하기
 
-```powershell
-cd web
+### 준비 사항
+
+- Node.js **20.9 이상**, npm
+- 별도로 구성한 Supabase 프로젝트와 DB 스키마
+- 이미지 생성용 R2 버킷 및 사용할 AI 제공자의 API 키
+
+> 저장소의 SQL은 개발 중 사용한 스키마·변경 기록입니다. 빈 DB에 순서대로 적용하는 통합 설치 절차는 검증되지 않았으므로, 먼저 [DB 준비 안내](docs/DEVELOPMENT.md#데이터베이스)를 확인해 주세요. 외부 서비스 설정을 완료해야 인증과 이미지 생성 기능을 실행할 수 있습니다.
+
+### 웹 앱 실행
+
+```bash
+git clone https://github.com/Dav3411/zeriv.git
+cd zeriv/web
 npm ci
-Copy-Item .env.example .env.local
-# .env.local에 별도로 준비한 테스트용 프로젝트 설정을 입력합니다.
+cp .env.example .env.local
+```
+
+[환경 변수 템플릿](web/.env.example)을 참고해 `.env.local`을 설정합니다. Windows PowerShell에서는 `cp` 대신 `Copy-Item .env.example .env.local`을 사용할 수 있습니다.
+
+```bash
 npm run dev
 ```
 
-브라우저는 `http://localhost:3000`으로 접속합니다. 인증·데이터 기능에는 본인 소유의 Supabase 테스트 프로젝트가 필요합니다. 서버 비밀 키는 `NEXT_PUBLIC_` 변수에 넣지 않습니다.
+브라우저에서 [http://localhost:3000](http://localhost:3000)에 접속합니다. `/studio`는 로그인·브랜드 상태에 따라 해당 Studio로 이동하는 진입 경로입니다.
 
-이미지 생성까지 실행하려면 R2 버킷과 사용 경로에 해당하는 AI 제공자 API 키가 필요합니다. 실제 요청은 **유료 사용량을 발생시킬 수 있습니다.** 웹과 워커가 같은 DB 및 `JOB_SOURCE`를 사용하도록 설정한 뒤 별도 터미널에서 실행합니다.
+### 이미지 생성 워커 실행
 
-```powershell
-cd web
+별도 터미널의 `zeriv/web` 디렉터리에서 실행합니다.
+
+```bash
 npm run worker:run
 ```
 
-워커는 시작하면 대기 작업을 처리할 수 있습니다. `.env.example`은 실서비스 자격증명 없이 테스트용 값을 채우기 위한 템플릿입니다. 결제·이메일 기능은 별도 테스트 계정으로 설정합니다. 프런트엔드 사업자 정보와 연락처는 예제값입니다.
+웹 앱과 워커는 같은 DB와 `JOB_SOURCE`를 사용해야 합니다. 워커는 대기 작업을 처리하며 외부 AI API 사용 요금이 발생할 수 있습니다. 자세한 설정은 [개발 가이드](docs/DEVELOPMENT.md)를 참고해 주세요.
 
-### 데이터베이스 준비 범위
+## 프로젝트 구조
 
-`web/sql/`에는 기존 스키마·변경 SQL, `web/sql/brand-migrations/`에는 브랜드 파이프라인 SQL, `web/supabase/migrations/`에는 후속 마이그레이션이 포함됩니다. 이는 스키마 설계 기록이며 **빈 DB에서 순서대로 실행 가능한 통합 설치 절차로 검증된 상태는 아닙니다.** 파일 사이의 선행 테이블·함수·정책 의존성과 중복 변경을 검토한 후 별도 테스트 DB에 적용해야 합니다. 운영 DB, 계정, 고객 데이터와 배포 설정은 제공하지 않습니다.
-
-## 검증과 현재 제한
-
-```powershell
-npm run typecheck      # 원본 검사 범위: 기존 Jest 테스트 2개의 오류가 남아 있습니다.
-npm run typecheck:app  # 해당 레거시 테스트 2개만 제외한 앱 소스 추가 검사
-npm run build
-node --check scripts/worker.mjs
+```text
+zeriv/
+├── docs/                       # 개발 환경과 검증 기록
+└── web/
+    ├── src/
+    │   ├── app/
+    │   │   ├── [brandName]/studio/  # 브랜드별 Studio
+    │   │   └── api/             # 브랜드·스타일·생성 API
+    │   ├── components/         # 공통 UI와 상태 관리
+    │   └── lib/
+    │       ├── style/          # 스타일 데이터·프롬프트·시트
+    │       └── r2.ts           # 파일 업로드·다운로드
+    ├── scripts/worker.mjs      # 이미지 생성 워커
+    ├── public/                # 정적 이미지와 데모 자산
+    ├── sql/                   # 스키마·변경 SQL
+    └── supabase/migrations/    # 후속 마이그레이션
 ```
 
-- `npm ci --ignore-scripts --no-audit --no-fund`, 앱 타입검사, 워커 3개 파일의 구문검사를 통과했습니다. 자격증명 없이 수행한 Next.js 프로덕션 빌드도 완료됐으며, 블로그 sitemap 조회는 Supabase 설정 누락으로 생략됐습니다. 빌드 성공이 생성·결제 기능의 실행 검증을 의미하지는 않습니다.
-- 원본 `tsconfig.json`은 보존했습니다. 기존 Jest 테스트 2개는 러너·타입 의존성이 구성되지 않았고 일부 fixture 타입도 현재 계약과 달라 전체 타입검사가 실패합니다. 테스트 소스는 보존하며 앱 검사 결과와 구분합니다.
-- 현재 설명 대상은 이미지 생성 경로입니다. `/api/render-jobs`와 `/api/internal/pipeline` 등 레거시 경로는 `410`을 반환하며, 남아 있는 영상 파이프라인 코드 전체가 작동한다고 보장하지 않습니다. 외부 GPU 서브 워커와 모델 가중치는 포함하지 않습니다.
-- 새 테스트 DB에서 인증→생성→결과 저장까지의 통합 실행, 결제와 이메일 발송은 이 스냅샷 정리 과정에서 수행하지 않았습니다.
-- `public/studio-showcase` 등 정적 이미지는 UI 설명을 위한 데모 자산입니다. 실사용 지표나 실제 고객 생성 결과의 증거가 아닙니다. 대형 랜딩 영상과 별도 실험 이미지 일부는 제외되어 해당 미디어가 표시되지 않을 수 있습니다.
-- 빌드 중 `next/font/google`의 폰트 다운로드에는 네트워크 연결이 필요합니다.
+## 개발 명령어
 
-## 라이선스와 자산
+`web` 디렉터리에서 실행합니다.
 
-이 스냅샷에 새로운 오픈소스 라이선스를 부여하지 않았습니다. 패키지와 외부 서비스·모델·자산은 각각의 라이선스와 이용 조건을 따릅니다. 포함된 데모 이미지를 별도 재배포할 때에는 출처와 사용 권한을 확인해야 합니다.
+| 명령어 | 용도 |
+| --- | --- |
+| `npm run dev` | 개발 서버 |
+| `npm run worker:run` | 이미지 생성 워커 |
+| `npm run typecheck:app` | 앱 소스 타입 검사 |
+| `npm run build` | 프로덕션 빌드 |
+| `npm run start` | 빌드한 웹 앱 실행 |
+
+`typecheck:app`은 레거시 테스트 2개를 제외합니다. 전체 타입 검사와 외부 서비스 통합 실행의 확인 범위는 [검증 기록](docs/VALIDATION.md)에 정리했습니다.
+
+## 관련 문서
+
+- [개발 환경·환경 변수·DB 준비](docs/DEVELOPMENT.md)
+- [검증 결과와 알려진 제한](docs/VALIDATION.md)
+- [이미지 생성 요청 API](web/src/app/api/render/create-job/route.ts)
+- [스타일 처리 모듈](web/src/lib/style/)
+- [이미지 생성 워커](web/scripts/worker.mjs)
+
+## 개발 정보
+
+- **기간:** 3개월
+- **팀:** 2인
+- **최성원:** 서비스 기획, 프론트엔드·백엔드 전반 구현 및 시스템 구성
+- **GitHub:** [@Dav3411](https://github.com/Dav3411)
+
+## 라이선스
+
+이 저장소에는 별도 오픈소스 라이선스를 지정하지 않았습니다. 의존 패키지와 외부 서비스·모델·자산은 각각의 라이선스 및 이용 조건을 따릅니다.
